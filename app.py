@@ -1,8 +1,28 @@
 from flask import Flask, request, jsonify
 import requests
 import os
+from datetime import datetime 
 
 app = Flask(__name__)
+
+def log_to_google_sheets(direction, user, phone, message):
+    webhook_url = os.environ.get("GOOGLE_SHEET_WEBHOOK")
+
+    if not webhook_url:
+        print("⚠️ No Google Sheet webhook URL set.")
+        return
+
+    payload = {
+        "direction": direction,
+        "user": user,
+        "phone": phone,
+        "message": message,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    response = requests.post(webhook_url, json=payload)
+    print(f"📋 Google Sheet log status: {response.status_code}")
+
 
 @app.route('/slack', methods=['POST'])
 def send_sms():
@@ -26,6 +46,7 @@ def send_sms():
     res = requests.post('https://api.promotexter.com/sms/send', json=payload)
 
     if res.status_code == 200:
+        log_to_google_sheets("outbound", user, number, message)
         return jsonify({'text': f'✅ SMS sent to {number} by {user}'}), 200
     else:
         return jsonify({'text': f'❌ Failed to send SMS. {res.text}'}), 200
