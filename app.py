@@ -17,8 +17,8 @@ def send_sms():
     payload = {
         "apiKey": os.environ['PROMOTEXTER_API_KEY'],
         "apiSecret": os.environ['PROMOTEXTER_API_SECRET'],
-        "recipient": number,
-        "message": message
+        "to": number,
+        "text": message
     }
     print(payload)
 
