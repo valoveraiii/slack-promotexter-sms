@@ -51,9 +51,11 @@ def send_sms():
     else:
         return jsonify({'text': f'❌ Failed to send SMS. {res.text}'}), 200
 
+
 @app.route('/')
 def home():
     return 'Promotexter SMS Bot is live!'
+
 
 @app.route('/inbound', methods=['GET', 'POST'])
 def receive_sms():
@@ -64,6 +66,9 @@ def receive_sms():
     message = request.args.get('message')
 
     print(f"📩 Incoming SMS from {sender}: {message}")
+
+    # ✅ Added logging here
+    log_to_google_sheets("inbound", "external", sender, message)
 
     slack_webhook_url = os.environ.get('SLACK_WEBHOOK_URL')
     if slack_webhook_url and sender and message:
