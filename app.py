@@ -36,6 +36,9 @@ def home():
 
 @app.route('/inbound', methods=['GET', 'POST'])
 def receive_sms():
+    print("🟡 Raw query string:", request.query_string)
+    print("🟡 Full request args:", request.args)
+
     sender = request.args.get('from')
     message = request.args.get('message')
 
@@ -47,13 +50,11 @@ def receive_sms():
             "text": f"📨 *New SMS from {sender}:*\n>{message}"
         }
         slack_response = requests.post(slack_webhook_url, json=slack_payload)
-
-        # 🔍 Log Slack's response
         print(f"📤 Slack webhook response: {slack_response.status_code} - {slack_response.text}")
+    else:
+        print("⚠️ Missing sender or message — not sent to Slack")
 
     return jsonify({'status': 'received'}), 200
-
-
 
 
 if __name__ == '__main__':
