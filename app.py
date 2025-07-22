@@ -34,25 +34,22 @@ def send_sms():
 def home():
     return 'Promotexter SMS Bot is live!'
 
-@app.route('/inbound', methods=['POST'])
+@app.route('/inbound', methods=['GET', 'POST'])
 def receive_sms():
-    data = request.get_json()
-
-    sender = data.get('from')
-    message = data.get('text')
+    sender = request.args.get('from')
+    message = request.args.get('message')
 
     print(f"📩 Incoming SMS from {sender}: {message}")
 
-    # Send message to Slack via Incoming Webhook
     slack_webhook_url = os.environ.get('SLACK_WEBHOOK_URL')
-
-    if slack_webhook_url:
+    if slack_webhook_url and sender and message:
         slack_payload = {
             "text": f"📨 *New SMS from {sender}:*\n>{message}"
         }
         requests.post(slack_webhook_url, json=slack_payload)
 
     return jsonify({'status': 'received'}), 200
+
 
 
 if __name__ == '__main__':
