@@ -20,6 +20,7 @@ def send_sms():
         "recipient": number,
         "message": message
     }
+    print(payload)
 
     res = requests.post('https://api.promotexter.com/sms/send', json=payload)
 
