@@ -46,9 +46,13 @@ def receive_sms():
         slack_payload = {
             "text": f"📨 *New SMS from {sender}:*\n>{message}"
         }
-        requests.post(slack_webhook_url, json=slack_payload)
+        slack_response = requests.post(slack_webhook_url, json=slack_payload)
+
+        # 🔍 Log Slack's response
+        print(f"📤 Slack webhook response: {slack_response.status_code} - {slack_response.text}")
 
     return jsonify({'status': 'received'}), 200
+
 
 
 
